@@ -7,14 +7,14 @@ import pandas as pd
 
 # 데이터 읽어 오기 
 u_cols = ['user_id', 'age', 'sex', 'occupation', 'zip_code']
-users = pd.read_csv('C:/RecoSys/Data/u.user', sep='|', names=u_cols, encoding='latin-1')
+users = pd.read_csv('recsys/data/u.user', sep='|', names=u_cols, encoding='latin-1')
 i_cols = ['movie_id', 'title', 'release date', 'video release date', 'IMDB URL', 'unknown', 
           'Action', 'Adventure', 'Animation', 'Children\'s', 'Comedy', 'Crime', 'Documentary', 
           'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical', 'Mystery', 'Romance', 'Sci-Fi', 
           'Thriller', 'War', 'Western']
-movies = pd.read_csv('C:/RecoSys/Data/u.item', sep='|', names=i_cols, encoding='latin-1')
+movies = pd.read_csv('recsys/data/u.item', sep='|', names=i_cols, encoding='latin-1')
 r_cols = ['user_id', 'movie_id', 'rating', 'timestamp']
-ratings = pd.read_csv('C:/RecoSys/Data/u.data', sep='\t', names=r_cols, encoding='latin-1')
+ratings = pd.read_csv('recsys/data/u.data', sep='\t', names=r_cols, encoding='latin-1')
 
 # timestamp 제거 
 ratings = ratings.drop('timestamp', axis=1)
@@ -52,7 +52,7 @@ def best_seller(user_id, movie_id):
     return rating
 
 train_mean = x_train.groupby(['movie_id'])['rating'].mean()
-score(best_seller)
+print("best_seller: ", score(best_seller))
 
 # Full matrix를 사용자 데이터와 merge
 merged_ratings = pd.merge(x_train, users)
@@ -74,5 +74,53 @@ def cf_gender(user_id, movie_id):
         gender_rating = 3.0
     return gender_rating
 
-score(cf_gender)
+print("cf_gender: ", score(cf_gender))
 
+
+
+
+##### 가설 1 #####
+
+# 정보가 없는 영화에 3점 대신 모든 영화의 평균으로 대체
+def best_seller_not3(user_id, movie_id):
+
+    try:
+        rating = train_mean[movie_id]
+    except:
+        rating = train_mean.mean()
+    return rating
+
+print("best_seller_not3: ", score(best_seller_not3))
+
+
+##### 가설 2 #####
+
+# 사용자별 평균 평점 계산
+user_mean_rating = ratings.groupby('user_id')['rating'].mean()
+
+# 전체 사용자의 평균평점 계산
+overall_mean_rating = ratings['rating'].mean()
+
+# user의 점수 주는 기준이 짠지 후한지 계산 (사용자별평균평점 - 전체 사용자의 평균평점)
+user_rating_deviation = user_mean_rating - overall_mean_rating
+
+# 평가기준 짠지 후한지를 고려해서 계산하는 기본 모델
+def best_seller_with_deviation(user_id, movie_id):
+    try:
+        rating = train_mean[movie_id] + user_rating_deviation[user_id]
+    except:
+        rating = 3.0
+    return rating
+
+print("best_seller_with_deviation: ", score(best_seller_with_deviation))
+
+
+# 전체 평균으로 예측치를 계산하는 기본 모델
+def best_seller_with_deviation_not3(user_id, movie_id):
+    try:
+        rating = train_mean[movie_id] + user_rating_deviation[user_id]
+    except:
+        rating = train_mean.mean() + user_rating_deviation[user_id]
+    return rating
+
+print("best_seller_with_deviation_not3: ", score(best_seller_with_deviation_not3))
