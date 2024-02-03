@@ -5,7 +5,7 @@
 import pandas as pd
 
 # Data 읽기
-movies = pd.read_csv('C:/RecoSys/Data/movies_metadata.csv', encoding='latin-1', low_memory=False)
+movies = pd.read_csv('data/movies_metadata.csv', encoding='latin-1', low_memory=False)
 movies = movies[['id', 'title', 'overview']]
 movies.head(10)
 len(movies)

@@ -7,14 +7,14 @@ import pandas as pd
 
 # 데이터 읽어 오기 
 u_cols = ['user_id', 'age', 'sex', 'occupation', 'zip_code']
-users = pd.read_csv('C:/RecoSys/Data/u.user', sep='|', names=u_cols, encoding='latin-1')
+users = pd.read_csv('data/u.user', sep='|', names=u_cols, encoding='latin-1')
 i_cols = ['movie_id', 'title', 'release date', 'video release date', 'IMDB URL', 'unknown', 
           'Action', 'Adventure', 'Animation', 'Children\'s', 'Comedy', 'Crime', 'Documentary', 
           'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical', 'Mystery', 'Romance', 'Sci-Fi', 
           'Thriller', 'War', 'Western']
-movies = pd.read_csv('C:/RecoSys/Data/u.item', sep='|', names=i_cols, encoding='latin-1')
+movies = pd.read_csv('data/u.item', sep='|', names=i_cols, encoding='latin-1')
 r_cols = ['user_id', 'movie_id', 'rating', 'timestamp']
-ratings = pd.read_csv('C:/RecoSys/Data/u.data', sep='\t', names=r_cols, encoding='latin-1')
+ratings = pd.read_csv('data/u.data', sep='\t', names=r_cols, encoding='latin-1')
 
 # timestamp 제거 
 ratings = ratings.drop('timestamp', axis=1)
@@ -70,5 +70,39 @@ def CF_simple(user_id, movie_id):
     return mean_rating
 
 # 정확도 계산
-score(CF_simple)
+print(score(CF_simple))
+
+
+
+# 연습문제 1
+
+# train set의 모든 가능한 사용자 pair의 피어슨 상관계수 계산
+matrix_dummy = rating_matrix.fillna(0)  # 결측치를 0으로 대체
+user_similarity = matrix_dummy.T.corr()  # 피어슨 상관계수 계산
+
+# 상관계수 행렬을 DataFrame으로 변환하고, 인덱스와 컬럼 설정
+user_similarity = pd.DataFrame(user_similarity, index=rating_matrix.index, columns=rating_matrix.index)
+
+# 주어진 영화의 (movie_id) 가중평균 rating을 계산하는 함수, 
+# 가중치는 주어진 사용자와 다른 사용자 간의 유사도(user_similarity)
+def CF_simple(user_id, movie_id):
+    if movie_id in rating_matrix:
+        # 현재 사용자와 다른 사용자 간의 similarity 가져오기
+        sim_scores = user_similarity[user_id].copy()
+        # 현재 영화에 대한 모든 사용자의 rating값 가져오기
+        movie_ratings = rating_matrix[movie_id].copy()
+        # 현재 영화를 평가하지 않은 사용자의 index 가져오기
+        none_rating_idx = movie_ratings[movie_ratings.isnull()].index
+        # 현재 영화를 평가하지 않은 사용자의 rating (null) 제거
+        movie_ratings = movie_ratings.dropna()
+        # 현재 영화를 평가하지 않은 사용자의 similarity값 제거
+        sim_scores = sim_scores.drop(none_rating_idx)
+        # 현재 영화를 평가한 모든 사용자의 가중평균값 구하기
+        mean_rating = np.dot(sim_scores, movie_ratings) / sim_scores.sum()
+    else:
+        mean_rating = 3.0
+    return mean_rating
+
+# 정확도 계산
+print(score(CF_simple))
 

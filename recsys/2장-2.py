@@ -7,14 +7,14 @@ import pandas as pd
 
 # 데이터 읽어 오기 
 u_cols = ['user_id', 'age', 'sex', 'occupation', 'zip_code']
-users = pd.read_csv('recsys/data/u.user', sep='|', names=u_cols, encoding='latin-1')
+users = pd.read_csv('data/u.user', sep='|', names=u_cols, encoding='latin-1')
 i_cols = ['movie_id', 'title', 'release date', 'video release date', 'IMDB URL', 'unknown', 
           'Action', 'Adventure', 'Animation', 'Children\'s', 'Comedy', 'Crime', 'Documentary', 
           'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical', 'Mystery', 'Romance', 'Sci-Fi', 
           'Thriller', 'War', 'Western']
-movies = pd.read_csv('recsys/data/u.item', sep='|', names=i_cols, encoding='latin-1')
+movies = pd.read_csv('data/u.item', sep='|', names=i_cols, encoding='latin-1')
 r_cols = ['user_id', 'movie_id', 'rating', 'timestamp']
-ratings = pd.read_csv('recsys/data/u.data', sep='\t', names=r_cols, encoding='latin-1')
+ratings = pd.read_csv('data/u.data', sep='\t', names=r_cols, encoding='latin-1')
 
 # timestamp 제거 
 ratings = ratings.drop('timestamp', axis=1)

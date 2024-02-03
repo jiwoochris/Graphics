@@ -7,14 +7,14 @@ import pandas as pd
 
 # 데이터 읽어 오기 
 u_cols = ['user_id', 'age', 'sex', 'occupation', 'zip_code']
-users = pd.read_csv('C:/RecoSys/Data/u.user', sep='|', names=u_cols, encoding='latin-1')
+users = pd.read_csv('data/u.user', sep='|', names=u_cols, encoding='latin-1')
 i_cols = ['movie_id', 'title', 'release date', 'video release date', 'IMDB URL', 'unknown', 
           'Action', 'Adventure', 'Animation', 'Children\'s', 'Comedy', 'Crime', 'Documentary', 
           'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical', 'Mystery', 'Romance', 'Sci-Fi', 
           'Thriller', 'War', 'Western']
-movies = pd.read_csv('C:/RecoSys/Data/u.item', sep='|', names=i_cols, encoding='latin-1')
+movies = pd.read_csv('data/u.item', sep='|', names=i_cols, encoding='latin-1')
 r_cols = ['user_id', 'movie_id', 'rating', 'timestamp']
-ratings = pd.read_csv('C:/RecoSys/Data/u.data', sep='\t', names=r_cols, encoding='latin-1')
+ratings = pd.read_csv('data/u.data', sep='\t', names=r_cols, encoding='latin-1')
 
 # timestamp 제거 
 ratings = ratings.drop('timestamp', axis=1)
@@ -93,14 +93,14 @@ def CF_knn_bias(user_id, movie_id, neighbor_size=0):
         prediction = rating_mean[user_id]
     return prediction
 
-score(CF_knn_bias, 30)
+print(score(CF_knn_bias, 30))
 
 
 ###################### 추천하기 ######################
 # 추천을 위한 데이터 읽기 (추천을 위해서는 전체 데이터를 읽어야 함)
 import pandas as pd
 r_cols = ['user_id', 'movie_id', 'rating', 'timestamp']
-ratings = pd.read_csv('C:/RecoSys/Data/u.data', names=r_cols,  sep='\t',encoding='latin-1')
+ratings = pd.read_csv('data/u.data', names=r_cols,  sep='\t',encoding='latin-1')
 ratings = ratings.drop('timestamp', axis=1)
 rating_matrix = ratings.pivot(values='rating', index='user_id', columns='movie_id')
 
@@ -128,6 +128,6 @@ def recommender(user, n_items=10):
     return recommended_items
 
 # 영화 추천 함수 부르기
-recommender(2, 10)
+print(recommender(2, 10))
 
 

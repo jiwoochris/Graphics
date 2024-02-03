@@ -7,14 +7,14 @@ import pandas as pd
 
 # 데이터 읽어 오기 
 u_cols = ['user_id', 'age', 'sex', 'occupation', 'zip_code']
-users = pd.read_csv('C:/RecoSys/Data/u.user', sep='|', names=u_cols, encoding='latin-1')
+users = pd.read_csv('data/u.user', sep='|', names=u_cols, encoding='latin-1')
 i_cols = ['movie_id', 'title', 'release date', 'video release date', 'IMDB URL', 'unknown', 
           'Action', 'Adventure', 'Animation', 'Children\'s', 'Comedy', 'Crime', 'Documentary', 
           'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical', 'Mystery', 'Romance', 'Sci-Fi', 
           'Thriller', 'War', 'Western']
-movies = pd.read_csv('C:/RecoSys/Data/u.item', sep='|', names=i_cols, encoding='latin-1')
+movies = pd.read_csv('data/u.item', sep='|', names=i_cols, encoding='latin-1')
 r_cols = ['user_id', 'movie_id', 'rating', 'timestamp']
-ratings = pd.read_csv('C:/RecoSys/Data/u.data', sep='\t', names=r_cols, encoding='latin-1')
+ratings = pd.read_csv('data/u.data', sep='\t', names=r_cols, encoding='latin-1')
 
 # timestamp 제거 
 ratings = ratings.drop('timestamp', axis=1)
@@ -107,14 +107,14 @@ def CF_knn_bias_sig(user_id, movie_id, neighbor_size=0):
 
 SIG_LEVEL = 3
 MIN_RATINGS = 2
-score(CF_knn_bias_sig, 30)
+print(score(CF_knn_bias_sig, 30))
 
 
 ###################### 추천하기 ######################
 # 추천을 위한 데이터 읽기 (추천을 위해서는 전체 데이터를 읽어야 함)
 import pandas as pd
 r_cols = ['user_id', 'movie_id', 'rating', 'timestamp']
-ratings = pd.read_csv('C:/RecoSys/Data/u.data', names=r_cols,  sep='\t',encoding='latin-1')
+ratings = pd.read_csv('data/u.data', names=r_cols,  sep='\t',encoding='latin-1')
 ratings = ratings.drop('timestamp', axis=1)
 rating_matrix = ratings.pivot(values='rating', index='user_id', columns='movie_id')
 
@@ -148,5 +148,64 @@ def recommender(user, n_items=10, neighbor_size=20):
     return recommended_items
 
 # 영화 추천 함수 부르기
-recommender(2, 10, 30)
+print(recommender(2, 10, 30))
 
+
+
+
+
+
+# 연습 문제 3-3
+def CF_knn_bias_sig(user_id, movie_id, neighbor_size=0):
+    if movie_id in rating_bias:
+        # 현 user와 다른 사용자 간의 유사도 가져오기
+        sim_scores = user_similarity[user_id]
+        # 현 movie의 평점편차 가져오기
+        movie_ratings = rating_bias[movie_id]
+        # 현 movie에 대한 rating이 없는 사용자 표시
+        no_rating = movie_ratings.isnull()
+        # 현 사용자와 다른 사용자간 공통 평가 아이템 수 가져오기 
+        common_counts = counts[user_id]
+        # 공통으로 평가한 영화의 수가 SIG_LEVEL보다 낮은 사용자 표시
+        low_significance = common_counts < SIG_LEVEL
+        # 평가를 안 하였거나, SIG_LEVEL이 기준 이하인 user 제거
+        none_rating_idx = movie_ratings[no_rating | low_significance].index
+        movie_ratings = movie_ratings.drop(none_rating_idx)
+        sim_scores = sim_scores.drop(none_rating_idx)
+##### (2) Neighbor size가 지정되지 않은 경우        
+        if neighbor_size == 0:
+            # 편차로 예측값(편차 예측값) 계산
+            prediction = np.dot(sim_scores, movie_ratings) / sim_scores.sum()
+            # 편차 예측값에 현 사용자의 평균 더하기
+            prediction = prediction + rating_mean[user_id]
+##### (3) Neighbor size가 지정된 경우            
+        else:
+            # 해당 영화를 평가한 사용자가 최소 MIN_RATINGS 이상인 경우에만 계산            
+            if len(sim_scores) > MIN_RATINGS:
+                # 지정된 neighbor size 값과 해당 영화를 평가한 총사용자 수 중 작은 것으로 결정
+                neighbor_size = min(neighbor_size, len(sim_scores))
+                # array로 바꾸기 (argsort를 사용하기 위함)
+                sim_scores = np.array(sim_scores)
+                movie_ratings = np.array(movie_ratings)
+                # 유사도를 순서대로 정렬
+                user_idx = np.argsort(sim_scores)
+                # 유사도와 rating을 neighbor size만큼 받기
+                sim_scores = sim_scores[user_idx][-neighbor_size:]
+                movie_ratings = movie_ratings[user_idx][-neighbor_size:]
+                # 편차로 예측치 계산
+                prediction = np.dot(sim_scores, movie_ratings) / sim_scores.sum()
+                # 예측값에 현 사용자의 평균 더하기
+                prediction = prediction + rating_mean[user_id]
+            else:
+                prediction = rating_mean[user_id]
+    else:
+        prediction = rating_mean[user_id]
+
+    if prediction > 5:
+        prediction = 5
+    elif prediction < 1:
+        prediction = 1
+
+    return prediction
+
+print(score(CF_knn_bias_sig, 30))
