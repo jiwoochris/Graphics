@@ -31,12 +31,22 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, strati
 def RMSE(y_true, y_pred):
     return np.sqrt(np.mean((np.array(y_true) - np.array(y_pred))**2))
 
+def MAE(y_true, y_pred):
+    return np.mean(abs(np.array(y_true) - np.array(y_pred)))
+
 # 모델별 RMSE를 계산하는 함수 
 def score(model):
     id_pairs = zip(x_test['user_id'], x_test['movie_id'])
     y_pred = np.array([model(user, movie) for (user, movie) in id_pairs])
     y_true = np.array(x_test['rating'])
     return RMSE(y_true, y_pred)
+
+# 모델별 RAE를 계산하는 함수 
+def score_MAE(model):
+    id_pairs = zip(x_test['user_id'], x_test['movie_id'])
+    y_pred = np.array([model(user, movie) for (user, movie) in id_pairs])
+    y_true = np.array(x_test['rating'])
+    return MAE(y_true, y_pred)
 
 # train 데이터로 Full matrix 구하기 
 rating_matrix = x_train.pivot(index='user_id', columns='movie_id', values='rating')
@@ -72,6 +82,7 @@ def CF_simple(user_id, movie_id):
 # 정확도 계산
 print(score(CF_simple))
 
+print(score_MAE(CF_simple))
 
 
 # 연습문제 1
@@ -106,3 +117,4 @@ def CF_simple(user_id, movie_id):
 # 정확도 계산
 print(score(CF_simple))
 
+print(score_MAE(CF_simple))

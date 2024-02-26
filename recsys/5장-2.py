@@ -8,18 +8,18 @@ from sklearn.utils import shuffle
 
 # Load the u.user file into a dataframe
 u_cols = ['user_id', 'age', 'sex', 'occupation', 'zip_code']
-users = pd.read_csv('C:/RecoSys/Data/u.user', sep='|', names=u_cols, encoding='latin-1')
+users = pd.read_csv('data/u.user', sep='|', names=u_cols, encoding='latin-1')
 
 # Load the u.item file into a dataframe
 i_cols = ['movie_id', 'title', 'release date', 'video release date', 'IMDB URL', 
           'unknown', 'Action', 'Adventure', 'Animation', 'Children\'s', 'Comedy', 
           'Crime', 'Documentary', 'Drama', 'Fantasy', 'Film-Noir', 'Horror', 
           'Musical', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War', 'Western']
-movies = pd.read_csv('C:/RecoSys/Data/u.item', sep='|', names=i_cols, encoding='latin-1')
+movies = pd.read_csv('data/u.item', sep='|', names=i_cols, encoding='latin-1')
 
 # Load the u.data file into a dataframe
 r_cols = ['user_id', 'movie_id', 'rating', 'timestamp']
-ratings = pd.read_csv('C:/RecoSys/Data/u.data', sep='\t', names=r_cols, encoding='latin-1') 
+ratings = pd.read_csv('data/u.data', sep='\t', names=r_cols, encoding='latin-1') 
 
 # User encoding
 user_dict = {}
