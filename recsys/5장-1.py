@@ -8,7 +8,7 @@ from sklearn.utils import shuffle
 
 # Load the u.data file into a dataframe
 r_cols = ['user_id', 'movie_id', 'rating', 'timestamp']
-ratings = pd.read_csv('C:/RecoSys/Data/u.data', sep='\t', names=r_cols, encoding='latin-1') 
+ratings = pd.read_csv('data/u.data', sep='\t', names=r_cols, encoding='latin-1') 
 
 # User encoding
 user_dict = {}

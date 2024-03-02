@@ -30,3 +30,11 @@ algo = KNNWithMeans()
 algo.fit(trainset)
 predictions = algo.test(testset)
 accuracy.rmse(predictions)
+
+
+# Build the full trainset
+trainset = data.build_full_trainset()
+
+# Iterate over the trainset to print some data
+for uid, iid, rating in trainset.all_ratings():
+    print(f"User: {uid}, Item: {iid}, Rating: {rating}")

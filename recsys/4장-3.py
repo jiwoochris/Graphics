@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 r_cols = ['user_id', 'movie_id', 'rating', 'timestamp']
-ratings = pd.read_csv('C:/RecoSys/Data/u.data', names=r_cols,  sep='\t',encoding='latin-1')
+ratings = pd.read_csv('data/u.data', names=r_cols,  sep='\t',encoding='latin-1')
 ratings = ratings[['user_id', 'movie_id', 'rating']].astype(int)            # timestamp 제거
 
 ##### (1)
