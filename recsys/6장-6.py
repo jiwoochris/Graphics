@@ -20,6 +20,9 @@ from surprise.model_selection import train_test_split
 # csv 파일에서 불러오기
 r_cols = ['user_id', 'movie_id', 'rating', 'timestamp']
 ratings = pd.read_csv('C:/RecoSys/Data/u.data', names=r_cols,  sep='\t',encoding='latin-1')
+
+print(ratings.info())
+
 reader = Reader(rating_scale=(1,5))
 data = Dataset.load_from_df(ratings[['user_id', 'movie_id', 
         'rating']], reader)
